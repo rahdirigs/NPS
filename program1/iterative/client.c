@@ -36,8 +36,7 @@ int main(int argc, char** argv) {
     if (sockfd == -1) { 
         printf("Socket creation failed!!!\n");
         exit(0);
-    } 
-    else {
+    } else {
         printf("Socket successfully created...\n");
     }
 
@@ -47,7 +46,7 @@ int main(int argc, char** argv) {
     servaddr.sin_addr.s_addr = inet_addr(argv[1]); 
     servaddr.sin_port = htons(PORT); 
   
-    if (connect(sockfd, (struct sockaddr*)&servaddr, sizeof(servaddr)) != 0) { 
+    if (connect(sockfd, (struct sockaddr*)& servaddr, sizeof(servaddr)) != 0) { 
         printf("Connection with the server failed!!!\n"); 
         exit(0); 
     } 
