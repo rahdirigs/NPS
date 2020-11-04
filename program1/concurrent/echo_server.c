@@ -8,22 +8,21 @@
 #include <fcntl.h>
 #include <arpa/inet.h>
 
-void str_echo(int connfd,int port) {
+void str_echo(int connfd, int port) {
     int n;
     int bufsize = 1024;
     char *buffer = malloc(bufsize);
     again:
         while((n = recv(connfd, buffer, bufsize, 0)) > 0) {
-	        send(connfd,buffer,n,0);
-            fputs(buffer,stdout);
-            printf("Port:%d \n",port);
+	        send(connfd, buffer, n, 0);
+            fputs(buffer, stdout);
+            printf("Port:%d \n", port);
         }
 	if (n < 0)
         goto again;
 }
 
-int main()
-{
+int main() {
     int cont, listenfd, connfd, addrlen, addrlen2, fd, pid, addrlen3;
     struct sockaddr_in address,cli_address;
 
@@ -54,7 +53,7 @@ int main()
         if((pid = fork()) == 0) {
 	        printf("Inside child\n");
 	        close(listenfd);
-	        str_echo(connfd,htons(cli_address.sin_port));
+	        str_echo(connfd, htons(cli_address.sin_port));
 	        exit(0);
 	    }
         close(connfd);
