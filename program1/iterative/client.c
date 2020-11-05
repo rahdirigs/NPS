@@ -31,30 +31,29 @@ void pleaseChat(int sockfd) {
 int main(int argc, char** argv) {
     int sockfd, connfd;
     struct sockaddr_in servaddr;
-  
-    sockfd = socket(AF_INET, SOCK_STREAM, 0); 
-    if (sockfd == -1) { 
+
+    sockfd = socket(AF_INET, SOCK_STREAM, 0);
+    if (sockfd == -1) {
         printf("Socket creation failed!!!\n");
         exit(0);
     } else {
         printf("Socket successfully created...\n");
     }
 
-    bzero(&servaddr, sizeof(servaddr)); 
-  
-    servaddr.sin_family = AF_INET; 
-    servaddr.sin_addr.s_addr = inet_addr(argv[1]); 
-    servaddr.sin_port = htons(PORT); 
-  
-    if (connect(sockfd, (struct sockaddr*)& servaddr, sizeof(servaddr)) != 0) { 
-        printf("Connection with the server failed!!!\n"); 
-        exit(0); 
-    } 
-    else {
+    bzero(&servaddr, sizeof(servaddr));
+
+    servaddr.sin_family = AF_INET;
+    servaddr.sin_addr.s_addr = inet_addr(argv[1]);
+    servaddr.sin_port = htons(PORT);
+
+    if (connect(sockfd, (struct sockaddr*)& servaddr, sizeof(servaddr)) != 0) {
+        printf("Connection with the server failed!!!\n");
+        exit(0);
+    } else {
         printf("Connected to the server...\n");
     }
 
-    pleaseChat(sockfd); 
-  
-    close(sockfd); 
-} 
+    pleaseChat(sockfd);
+
+    close(sockfd);
+}

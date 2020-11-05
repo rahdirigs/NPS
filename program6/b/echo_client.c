@@ -23,13 +23,13 @@ int main(int argc, char** argv) {
     serverAddress.sin_addr.s_addr = inet_addr(argv[1]);
     serverAddress.sin_port = htons(PORT);
 
-    connect(sockfd,(struct sockaddr *)& serverAddress, sizeof(serverAddress));
+    connect(sockfd, (struct sockaddr *)& serverAddress, sizeof(serverAddress));
 
-    while(1) {
+    while (1) {
         printf("\nEnter the message to be sent:\n");
         fgets(msg1, MAXSZ, stdin);
 
-        if(msg1[0] == '#')
+        if (msg1[0] == '#')
             break;
 
         n = strlen(msg1) + 1;

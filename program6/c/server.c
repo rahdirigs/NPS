@@ -12,19 +12,19 @@ void str_echo(int sockfd, struct sockaddr* cli_address, int clilen) {
     int n;
     int bufsize = 1024;
     char *buffer = malloc(bufsize);
-	int addrlen;
-	  
-	for(;;) {
-	    addrlen = clilen;
-  	    n = recvfrom(sockfd, buffer, bufsize, 0, cli_address, &addrlen);
+    int addrlen;
+
+    for (;;) {
+        addrlen = clilen;
+        n = recvfrom(sockfd, buffer, bufsize, 0, cli_address, &addrlen);
         fputs(buffer, stdout);
-	    sendto(sockfd, buffer, n, 0, cli_address, addrlen);
-    }	
+        sendto(sockfd, buffer, n, 0, cli_address, addrlen);
+    }
 }
 
 int main() {
     int sockfd;
-    struct sockaddr_in serv_address,cli_address;
+    struct sockaddr_in serv_address, cli_address;
 
     if ((sockfd = socket(AF_INET, SOCK_DGRAM, 0)) > 0)
         printf("The socket was created\n");
@@ -34,10 +34,10 @@ int main() {
     serv_address.sin_port = htons(16001);
     printf("The address before bind %s  ...\n", inet_ntoa(serv_address.sin_addr));
 
-    if (bind(sockfd,(struct sockaddr *)& serv_address, sizeof(serv_address)) == 0)
-        printf("Binding Socket\n");   
-    
-    str_echo(sockfd,(struct sockaddr *)& cli_address, sizeof(cli_address));
-	  
+    if (bind(sockfd, (struct sockaddr *)& serv_address, sizeof(serv_address)) == 0)
+        printf("Binding Socket\n");
+
+    str_echo(sockfd, (struct sockaddr *)& cli_address, sizeof(cli_address));
+
     return 0 ;
 }
