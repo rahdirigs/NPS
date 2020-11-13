@@ -1,42 +1,47 @@
-#include <stdio.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <string.h>
-#include <stdlib.h>
-#include <netinet/in.h>
 
-#define PORT 8000
-#define MAXSZ 100
+/*Client*/
+#include<sys/socket.h>
+#include<sys/types.h>
+#include<netinet/in.h>
+#include<unistd.h>
+#include<stdlib.h>
+#include<stdio.h>
 
-int main(int argc, char** argv) {
-    int sockfd;
+void str_cli(FILE *fp, int sockfd) {
+    int bufsize = 1024, cont;
+    char *buffer = malloc(bufsize);
 
-    struct sockaddr_in serverAddress;
+    while (fgets(buffer, bufsize, fp) != NULL) {
+        send(sockfd, buffer, sizeof(buffer), 0);
 
-    int n;
-    char msg1[MAXSZ];
-    char msg2[MAXSZ];
-
-    sockfd = socket(AF_INET, SOCK_STREAM, 0);
-    memset(&serverAddress, 0, sizeof(serverAddress));
-    serverAddress.sin_family = AF_INET;
-    serverAddress.sin_addr.s_addr = inet_addr(argv[1]);
-    serverAddress.sin_port = htons(PORT);
-
-    connect(sockfd, (struct sockaddr *)& serverAddress, sizeof(serverAddress));
-
-    while (1) {
-        printf("\nEnter the message to be sent:\n");
-        fgets(msg1, MAXSZ, stdin);
-
-        if (msg1[0] == '#')
-            break;
-
-        n = strlen(msg1) + 1;
-        send(sockfd, msg1, n, 0);
-
-        n = recv(sockfd, msg2, MAXSZ, 0);
+        if ((cont = recv(sockfd, buffer, bufsize, 0)) > 0) {
+            fputs(buffer, stdout);
+        }
     }
+    printf("\nEOF\n");
+}
 
-    return 0;
+int main(int argc, char *argv[]) {
+    int create_socket;
+
+    //char fname[256];
+    struct sockaddr_in address;
+    if ((create_socket = socket(AF_INET, SOCK_STREAM, 0)) > 0)
+        printf("The Socket was created\n");
+    address.sin_family = AF_INET;
+    address.sin_port = htons(15001);
+    inet_pton(AF_INET, argv[1], &address.sin_addr);
+    if (connect(create_socket, (struct sockaddr *) &address, sizeof(address)) == 0)
+        printf("The connection was accepted with the server %s...\n", argv[1]);
+    else
+        printf("error in connect \n");
+    //printf("Enter The Filename to Request : "); scanf("%s",fname);
+    //send(create_socket, fname, sizeof(fname), 0);
+    //printf("Request Accepted... Receiving File...\n\n");
+    //printf("The contents of file are...\n\n");
+
+    str_cli(stdin, create_socket);
+
+
+    return close(create_socket);
 }

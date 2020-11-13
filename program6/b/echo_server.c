@@ -1,50 +1,65 @@
-#include <stdio.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <string.h>
-#include <stdlib.h>
-#include <netinet/in.h>
+#include<sys/types.h>
+#include<sys/socket.h>
+#include<sys/stat.h>
 
-#define PORT 8000
-#define MAXSZ 100
+
+#include<stdio.h>
+#include<stdlib.h>
+#include<fcntl.h>
+#include<unistd.h>
+
+#include<netinet/in.h>
+#include<arpa/inet.h>
+
+void str_echo(int connfd) {
+    int n, bufsize = 1024, len;
+    char *buff = malloc(bufsize);
+    struct sockaddr_in addr;
+
+again: while ((n = recv(connfd, buff, bufsize, 0)) > 0)
+        send(connfd, buff, n, 0);
+
+    if (n < 0)
+        goto again;
+}
 
 int main() {
-    int sockfd;
-    int newsockfd;
+    int listenfd, connfd, addrlen, pid;
+    struct sockaddr_in address;
+    if ((listenfd = socket(AF_INET, SOCK_STREAM, 0)) > 0)
+        printf("The socket was created\n");
+    else
+        printf("Error in Socket creation\n");
 
-    struct sockaddr_in serverAddress;
-    struct sockaddr_in clientAddress;
+    address.sin_family = AF_INET;
+    address.sin_addr.s_addr = INADDR_ANY;
+    address.sin_port = htons(15001);
 
-    int n;
-    char msg[MAXSZ];
-    int clientAddressLength;
+    if ( bind( listenfd, (struct sockaddr *)& address, sizeof(address)) == 0)
+        printf("Binding Socket\n");
+    else
+        printf("ERROR in binding\n");
 
-    sockfd = socket(AF_INET, SOCK_STREAM, 0);
-    memset(&serverAddress, 0, sizeof(serverAddress));
+    if ((listen(listenfd, 3)) != 0) {
+        printf("Listen failed\n");
+        exit(0);
+    } else {
+        getsockname(listenfd, (struct sockaddr *) &address, &addrlen);
+        printf("Server listening on port  %d\n", address.sin_port);
+    }
 
-    serverAddress.sin_family = AF_INET;
-    serverAddress.sin_addr.s_addr = htonl(INADDR_ANY);
-    serverAddress.sin_port = htons(PORT);
 
-    bind(sockfd, (struct sockaddr *)&serverAddress, sizeof(serverAddress));
-    listen(sockfd, 5);
+    for (;;) {
+        addrlen = sizeof(struct sockaddr_in);
+        connfd = accept(listenfd, (struct sockaddr *)& address, &addrlen);
+        printf(" connfd is %d ", connfd);
+        if (connfd > 0)
+            printf("The client %s is connected \n", inet_ntoa(address.sin_addr));
+        else
+            printf("Not accepted\n");
 
-    while (1) {
-        printf("\nServer waiting for new client connection...\n");
-        clientAddressLength = sizeof(clientAddress);
-        newsockfd = accept(sockfd, (struct sockaddr*)& clientAddress, &clientAddressLength);
-
-        while (1) {
-            n = recv(newsockfd, msg, MAXSZ, 0);
-            if (n == 0) {
-                close(newsockfd);
-                break;
-            }
-            msg[n] = 0;
-            send(newsockfd, msg, n, 0);
-
-            printf("Received: %s\n", msg);
-        }
+        str_echo(connfd);
+        close(connfd);
     }
 
     return 0;
