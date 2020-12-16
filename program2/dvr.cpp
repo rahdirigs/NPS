@@ -5,12 +5,14 @@ const int INF = 1000;
 
 struct routerInfo {
     vector<int> costs;
-    vector<int> nextHops;
+    vector<int> from;
+    vector<vector<int>> path;
 
     routerInfo(int n) {
         costs = vector<int>(n, INF);
-        nextHops = vector<int>(n);
-        iota(nextHops.begin(), nextHops.end(), 0);
+        from = vector<int>(n);
+        iota(from.begin(), from.end(), 0);
+        path = vector<vector<int>>(n, vector<int>());
     }
 };
 
@@ -59,7 +61,7 @@ int main() {
                 costMatrix[i][j] = 0;
             }
             routers[i].costs[j] = costMatrix[i][j];
-            routers[i].nextHops[j] = j;
+            routers[i].from[j] = j;
         }
     }
 
@@ -78,7 +80,7 @@ int main() {
                 for (int k = 0; k < n; k++) {
                     if (routers[i].costs[j] > costMatrix[i][k] + routers[k].costs[j]) {
                         routers[i].costs[j] = routers[i].costs[k] + routers[k].costs[j];
-                        routers[i].nextHops[j] = k;
+                        routers[i].from[j] = k;
                         temp = true;
                     }
                 }
@@ -87,10 +89,24 @@ int main() {
     } while (temp);
 
     for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            int dest = j;
+            while (dest != i) {
+                routers[i].path[j].push_back(dest);
+                dest = routers[dest].from[i];
+            }
+            if (routers[i].path[j].empty()) {
+                routers[i].path[j].push_back(i);
+            }
+        }
+    }
+
+
+    for (int i = 0; i < n; i++) {
         cout << "\nRouting tables for router " << i + 1 << ":\n";
         cout << "Dest\tNext Hop\tCost\n";
         for (int j = 0; j < n; j++) {
-            cout << j + 1 << "\t" << routers[i].nextHops[j] + 1 << "\t\t" << routers[i].costs[j] << "\n";
+            cout << j + 1 << "\t" << routers[i].path[j].back() + 1 << "\t\t" << routers[i].costs[j] << "\n";
         }
     }
 }
