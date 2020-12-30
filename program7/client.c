@@ -10,7 +10,7 @@ void str_cli(FILE *fp, int sockfd) {
     char *buffer = malloc(bufsize);
 
     while (fgets(buffer, bufsize, fp) != NULL) {
-        send(sockfd, buffer, sizeof(buffer), 0);
+        send(sockfd, buffer, bufsize, 0);
         if ((cont = recv(sockfd, buffer, bufsize, 0)) > 0) {
         }
     }

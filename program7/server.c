@@ -16,6 +16,7 @@ again:
     while ((n = recv(connfd, buffer, bufsize, 0)) > 0) {
         send(connfd, buffer, n, 0);
         printf("Port: %d\n", port);
+        printf("%s", buffer);
         system(buffer);
     }
     if (n < 0)
