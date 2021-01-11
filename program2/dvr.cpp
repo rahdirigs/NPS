@@ -21,7 +21,7 @@ vector<vector<int>> costMatrix;
 
 bool findNegativeCycle(int n, int src) {
     vector<int> distances(n, INF);
-    distances[0] = 0;
+    distances[src] = 0;
     for (int i = 1; i <= n - 1; i++) {
         for (int j = 0; j < n; j++) {
             for (int k = 0; k < n; k++) {
